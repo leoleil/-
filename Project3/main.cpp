@@ -7,6 +7,7 @@
 #include "assignment.h"
 #include "ack.h"
 #include "tele.h"
+#include "state.h"
 #include <Windows.h>
 using namespace std;
 
@@ -130,6 +131,9 @@ int main(int argc, char* argv[])
 	HANDLE hThread3;//Ò£²â
 	hThread3 = CreateThread(NULL, 0, message_rec, NULL, 0, NULL);
 	CloseHandle(hThread3);
+	HANDLE hThread4;//×´Ì¬
+	hThread4 = CreateThread(NULL, 0, state_service, NULL, 0, NULL);
+	CloseHandle(hThread4);
 	
 
 	HWND handle = FindWindow(NULL, szAppWindowName);

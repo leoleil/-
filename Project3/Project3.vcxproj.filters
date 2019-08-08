@@ -36,9 +36,6 @@
     <ClCompile Include="StringNumUtils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="cancelAssignment.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="CancelMessage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -63,7 +60,13 @@
     <ClCompile Include="TeleSocket.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="cancel.cpp">
+    <ClCompile Include="StatesSocket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StateMessage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="state.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -84,9 +87,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="StringNumUtils.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="cancelAssignment.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CancelMessage.h">
@@ -113,7 +113,13 @@
     <ClInclude Include="TeleSocket.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="cancel.h">
+    <ClInclude Include="StatesSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StateMessage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="state.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,26 +1,25 @@
-#include "AckSocket.h"
+#include "StatesSocket.h"
 #include <iostream> 
 #include <sstream>
 #include <string>
 #include "MySQLInterface.h"
-#include "ACKMessage.h"
+#include "StateMessage.h"
 using namespace std;
 extern string MYSQL_SERVER;//连接的数据库ip
 extern string MYSQL_USERNAME;
 extern string MYSQL_PASSWORD;
-
-AckSocket::AckSocket()
+StatesSocket::StatesSocket()
 {
 }
 
 
-AckSocket::~AckSocket()
+StatesSocket::~StatesSocket()
 {
 }
 
-int AckSocket::createReceiveServer(const int port)
+int StatesSocket::createReceiveServer(const int port)
 {
-	cout << "| ACK 接收         | 服务启动" << endl;
+	cout << "| 状态接收         | 服务启动" << endl;
 	//初始化套结字动态库  
 	if (WSAStartup(MAKEWORD(2, 2), &S_wsd) != 0)
 	{
@@ -52,7 +51,7 @@ int AckSocket::createReceiveServer(const int port)
 	}
 
 	//开始监听   
-	cout << "| ACK 接收         | listening" << endl;
+	cout << "| 状态接收         | listening" << endl;
 	retVal = listen(sServer, 1);
 
 	if (SOCKET_ERROR == retVal)
@@ -75,7 +74,7 @@ int AckSocket::createReceiveServer(const int port)
 		return -1;
 	}
 
-	cout << "| ACK 接收         | TCP连接创建" << endl;
+	cout << "| 状态接收         | TCP连接创建" << endl;
 	while (true) {
 		//数据窗口
 		const int data_len = 66560;//每次接收65K数据包
@@ -93,13 +92,13 @@ int AckSocket::createReceiveServer(const int port)
 
 			if (SOCKET_ERROR == retVal)
 			{
-				cout << "| ACK 接收         | 接收程序出错" << endl;
+				cout << "| 状态接收         | 接收程序出错" << endl;
 				closesocket(sServer);   //关闭套接字    
 				closesocket(sClient);   //关闭套接字
 				return -1;
 			}
 			if (retVal == 0) {
-				cout << "| ACK 接收         | 接收完毕断开本次连接" << endl;
+				cout << "| 状态接收         | 接收完毕断开本次连接" << endl;
 				closesocket(sServer);   //关闭套接字    
 				closesocket(sClient);   //关闭套接字
 				return -1;
@@ -113,7 +112,7 @@ int AckSocket::createReceiveServer(const int port)
 			}
 
 		}
-		
+
 		//将获取到的数据放入更新到数据库
 		const char* SERVER = MYSQL_SERVER.data();//连接的数据库ip
 		const char* USERNAME = MYSQL_USERNAME.data();
@@ -135,32 +134,23 @@ int AckSocket::createReceiveServer(const int port)
 			//内存复制
 			memcpy(val, ptr + i, length);
 			//加入报文池
-			ACKMessage message;
+			StateMessage message;
 			message.messageParse(val);
 			if (mysql.connectMySQL(SERVER, USERNAME, PASSWORD, DATABASE, PORT)) {
-				
-				string sql = "UPDATE `任务分配表` SET `ACK` = " + to_string(message.getACK()) + " WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
+				char id[20];
+				message.getUavNo(id);
+				string sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES ( FROM_UNIXTIME(" + to_string(message.getStateStartTime()) + ")," + to_string(message.getState()) + ",'" + id + "');";
 				mysql.writeDataToDB(sql);
-				if (message.getACK() == 1300) {
-					sql = "UPDATE `任务分配表` SET `任务状态` = 7 WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
-				}
-				else if (message.getACK() == 1400) {
-					sql = "UPDATE `任务分配表` SET `任务状态` = 8 WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
-				}
-				else {
-					sql = "UPDATE `任务分配表` SET `任务状态` = 6 WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
-				}
-				mysql.writeDataToDB(sql);
-				cout << "| ACK 接收         | 成功" << endl;
+				cout << "| 状态接收         | 成功" << endl;
 				mysql.closeMySQL();
 			}
 			else {
-				cout << "| ACK 接收         | 数据库连接失败" << endl;
+				cout << "| 状态接收         | 数据库连接失败" << endl;
 			}
-			
-			
-			
-			
+
+
+
+
 
 		}
 

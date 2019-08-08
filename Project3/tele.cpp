@@ -107,10 +107,10 @@ DWORD message_pasing(LPVOID lpParameter)
 				bool flag;
 				memcpy(&flag, byte_data + ptr, 1);
 				ptr = ptr + 1;
-				//任务编号
-				UINT32 taskNum;
-				memcpy(&taskNum, byte_data + ptr, sizeof(UINT32));
-				ptr = ptr + sizeof(UINT32);
+				////任务编号
+				//UINT32 taskNum;
+				//memcpy(&taskNum, byte_data + ptr, sizeof(UINT32));
+				//ptr = ptr + sizeof(UINT32);
 				//设备名
 				char name[40];
 				memcpy(name, byte_data + ptr, 40);
@@ -269,9 +269,9 @@ DWORD message_pasing(LPVOID lpParameter)
 				bool flag;
 				memcpy(&flag, byte_data + ptr, sizeof(bool));
 				ptr = ptr + sizeof(bool);
-				UINT32 taskNum;
+				/*UINT32 taskNum;
 				memcpy(&taskNum, byte_data + ptr, sizeof(UINT32));
-				ptr = ptr + sizeof(UINT32);
+				ptr = ptr + sizeof(UINT32);*/
 				//设备名
 				char name[40];
 				memcpy(name, byte_data + ptr, 40);
@@ -321,7 +321,7 @@ DWORD message_pasing(LPVOID lpParameter)
 						}
 						//数据库中数据
 						else {
-							string sql = "insert into satellite_teledata.";
+							string sql = "insert into ";
 							sql = sql + satillitId + "_" + name + "(时间,";
 							string d_sql = " values(";
 							d_sql = d_sql + to_string(timestamp) + ",";
