@@ -142,13 +142,13 @@ int AckSocket::createReceiveServer(const int port)
 				string sql = "UPDATE `任务分配表` SET `ACK` = " + to_string(message.getACK()) + " WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
 				mysql.writeDataToDB(sql);
 				if (message.getACK() == 1300) {
-					sql = "UPDATE `任务分配表` SET `任务状态` = 7 WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
+					sql = "UPDATE `任务分配表` SET `任务状态` = 7, `上注时间` = FROM_UNIXTIME("+to_string(message.getTaskStartTime())+") WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
 				}
 				else if (message.getACK() == 1400) {
-					sql = "UPDATE `任务分配表` SET `任务状态` = 8 WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
+					sql = "UPDATE `任务分配表` SET `任务状态` = 8, `上注时间` = FROM_UNIXTIME(" + to_string(message.getTaskStartTime()) + ") WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
 				}
 				else {
-					sql = "UPDATE `任务分配表` SET `任务状态` = 6 WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
+					sql = "UPDATE `任务分配表` SET `任务状态` = 6, `上注时间` = FROM_UNIXTIME(" + to_string(message.getTaskStartTime()) + ") WHERE `任务编号` = " + to_string(message.getTaskNum()) + ";";
 				}
 				mysql.writeDataToDB(sql);
 				cout << "| ACK 接收         | 成功" << endl;
