@@ -141,7 +141,7 @@ int StatesSocket::createReceiveServer(const int port)
 				message.getUavNo(id);
 				string sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES ( FROM_UNIXTIME(" + to_string(message.getStateStartTime()) + ")," + to_string(message.getState()) + ",'" + id + "');";
 				mysql.writeDataToDB(sql);
-				cout << "| 状态接收         | 成功" << endl;
+						cout << "| 状态接收         | 成功" << endl;
 				mysql.closeMySQL();
 			}
 			else {

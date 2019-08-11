@@ -70,8 +70,8 @@ DWORD message_pasing(LPVOID lpParameter)
 	const char* SERVER = MYSQL_SERVER.data();//连接的数据库ip
 	const char* USERNAME = MYSQL_USERNAME.data();
 	const char* PASSWORD = MYSQL_PASSWORD.data();
-	const char DATABASE[20] = "satellite_teledata";
-	const char DATABASE_2[20] = "satellite_message";
+	const char DATABASE[20] = "uav_teledata";
+	const char DATABASE_2[20] = "uav_message";
 	const int PORT = 3306;
 	unordered_map<string, int> MAP;//用来标记第一个来的数据
 	while (1) {
@@ -137,7 +137,7 @@ DWORD message_pasing(LPVOID lpParameter)
 				char parentName[40];
 				memcpy(parentName, byte_data + ptr, 40);
 				ptr = ptr + 40;
-				//卫星编号
+				//无人机编号
 				char satillitId[20];
 				memcpy(satillitId, byte_data + ptr, 20);
 				ptr = ptr + 20;
@@ -172,7 +172,7 @@ DWORD message_pasing(LPVOID lpParameter)
 				if (db.connectMySQL(SERVER, USERNAME, PASSWORD, DATABASE, PORT)) {
 					//查询是否有该定义字段
 					string f_sql = "select * from 字段定义表 where 设备名 =";
-					f_sql = f_sql + "'" + name + "'and 卫星编号='"+ satillitId+"';";
+					f_sql = f_sql + "'" + name + "'and 无人机编号='"+ satillitId+"';";
 					vector<vector <string>>res;
 					if (!db.getDatafromDB(f_sql, res)) {
 						cout << db.errorNum << endl;
@@ -194,7 +194,7 @@ DWORD message_pasing(LPVOID lpParameter)
 						//创建字段定义
 						for (int i = 0; i < fields.size(); i++) {
 							//创建定义的sql语句
-							string sql = "insert into 字段定义表 (字段名,数据类型,最大值,最小值,单位,显示标志,设备名,卫星编号) values(";
+							string sql = "insert into 字段定义表 (字段名,数据类型,最大值,最小值,单位,显示标志,设备名,无人机编号) values(";
 							sql = sql + "'" + fields[i].name + "',";
 							sql = sql + to_string(fields[i].type) + ",";
 							//如果没有最大最小值
@@ -233,7 +233,7 @@ DWORD message_pasing(LPVOID lpParameter)
 							//cout << db->errorInfo << endl;
 						}
 						//创建关系表
-						string r_sql = "insert into 设备关系表(设备名,父设备名,卫星编号) values('";
+						string r_sql = "insert into 设备关系表(设备名,父设备名,无人机编号) values('";
 						r_sql = r_sql + name + "','" + parentName + "','"+ satillitId +"');";
 						if (!db.writeDataToDB(r_sql)) {
 							//cout << db->errorNum << endl;
@@ -261,7 +261,7 @@ DWORD message_pasing(LPVOID lpParameter)
 				//解析数据报文
 				//解析指针
 				int ptr = 6;
-							//时间戳
+				//时间戳
 				long long timestamp;
 				memcpy(&timestamp, byte_data + ptr, sizeof(long long));
 				ptr = ptr + sizeof(long long);
@@ -276,6 +276,10 @@ DWORD message_pasing(LPVOID lpParameter)
 				char name[40];
 				memcpy(name, byte_data + ptr, 40);
 				ptr = ptr + 40;
+				
+				//状态检测设备预留
+				long long t=0;
+				int state=0;
 
 				//写日志
 				if (MAP[name] == 0) {
@@ -296,14 +300,14 @@ DWORD message_pasing(LPVOID lpParameter)
 					}
 					
 				}
-				//卫星编号
+				//无人机编号
 				char satillitId[20];
 				memcpy(satillitId, byte_data + ptr, 20);
 				ptr = ptr + 20;
 				//采样时间
-				long long getTime;
+				/*long long getTime;
 				memcpy(&getTime, byte_data + ptr, sizeof(long long));
-				ptr = ptr + sizeof(long long);
+				ptr = ptr + sizeof(long long);*/
 				//如果数据库有此字段
 				//识别数据入库
 				MySQLInterface db;
@@ -314,7 +318,7 @@ DWORD message_pasing(LPVOID lpParameter)
 					//查询字段数据类型
 					vector<vector <string>>res;
 					string ff_sql = "select 数据类型,字段名 from 字段定义表 where 设备名=";
-					ff_sql = ff_sql + "'" + name + "'and 卫星编号='"+ satillitId +"' order by id;";
+					ff_sql = ff_sql + "'" + name + "'and 无人机编号='"+ satillitId +"' order by id;";
 					if (db.getDatafromDB(ff_sql, res)) {
 						if (res.size() == 0) {
 							cout << name << "设备不存在" << endl;
@@ -337,6 +341,7 @@ DWORD message_pasing(LPVOID lpParameter)
 									INT16 data = 0;
 									memcpy(&data, byte_data + ptr, sizeof(INT16));
 									ptr = ptr + sizeof(INT16);
+									state = data;
 									d_sql = d_sql + to_string(data);
 									if (i != res.size() - 1)d_sql = d_sql + ",";
 								}
@@ -365,6 +370,7 @@ DWORD message_pasing(LPVOID lpParameter)
 									INT64 data = 0;
 									memcpy(&data, byte_data + ptr, sizeof(INT64));
 									ptr = ptr + sizeof(INT64);
+									t = data;
 									d_sql = d_sql + to_string(data);
 									if (i != res.size() - 1)d_sql = d_sql + ",";
 								}
@@ -456,6 +462,10 @@ DWORD message_pasing(LPVOID lpParameter)
 							if (!db.writeDataToDB(sql)) {
 								//cout << db->errorNum << endl;
 								//cout << db->errorInfo << endl;
+							}
+							//如果是状态检测设备
+							if (strcmp(name, "状态检测设备")) {
+								sql = sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES ( FROM_UNIXTIME(" + to_string(t) + ")," + to_string(state) + ",'" + satillitId + "');";
 							}
 							//Sleep(10);
 							EnterCriticalSection(&data_CS);//进入关键代码段
