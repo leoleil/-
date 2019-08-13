@@ -118,13 +118,13 @@ DWORD message_pasing(LPVOID lpParameter)
 				//写入日志
 				MySQLInterface date_db;
 				if (date_db.connectMySQL(SERVER, USERNAME, PASSWORD, DATABASE_2, PORT)) {
-					string sql_difinition = "insert into 系统日志表 (时间,对象,事件类型,参数) values (now(),'遥测通信模块',11010,'通信中心机收到";
+					string sql_difinition = "insert into 系统日志表 (时间,对象,事件类型,事件说明) values (now(),'遥测通信模块',11010,'通信中心机收到";
 					sql_difinition = sql_difinition + name + "遥测报表定义报文');";
 					date_db.writeDataToDB(sql_difinition);
 					date_db.closeMySQL();
 				}
 
-				cout << "| 卫星遥测         | ";
+				cout << "| 通信模块         | ";
 				cout << getTime();
 				cout << "| 接收定义报文";
 				cout.setf(ios::left);
@@ -286,7 +286,7 @@ DWORD message_pasing(LPVOID lpParameter)
 					MAP[name] = 1;
 					MySQLInterface date_db;
 					if (date_db.connectMySQL(SERVER, USERNAME, PASSWORD, DATABASE_2, PORT)) {
-						string sql_data = "insert into 系统日志表 (时间,对象,事件类型,参数) values (now(),'遥测通信模块',11011,'通信中心机收到第一份";
+						string sql_data = "insert into 系统日志表 (时间,对象,事件类型,事件说明) values (now(),'遥测通信模块',11011,'通信中心机收到第一份";
 						sql_data = sql_data + name + "遥测报表数据报文');";
 						cout << "| 通信模块 | ";
 						cout << getTime();
@@ -464,8 +464,10 @@ DWORD message_pasing(LPVOID lpParameter)
 								//cout << db->errorInfo << endl;
 							}
 							//如果是状态检测设备
-							if (strcmp(name, "状态检测设备")) {
-								sql = sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES ( FROM_UNIXTIME(" + to_string(t) + ")," + to_string(state) + ",'" + satillitId + "');";
+							if (strcmp(name, "状态检测设备")==0) {
+								/*sql = sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES ( FROM_UNIXTIME(" + to_string(t) + ")," + to_string(state) + ",'" + satillitId + "');";*/
+								sql = sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES (" + to_string(t) + "," + to_string(state) + ",'" + satillitId + "');";
+								db.writeDataToDB(sql);
 							}
 							//Sleep(10);
 							EnterCriticalSection(&data_CS);//进入关键代码段

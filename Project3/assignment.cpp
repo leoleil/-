@@ -81,11 +81,11 @@ DWORD WINAPI assignment(LPVOID lpParameter) {
 				socketer.offSendServer();
 				//修改数据库分发标志
 				string ackSql = "update 任务分配表 set 任务状态 = 3, 发布时间 = now() where 任务编号 = " + dataSet[i][0];
-				string logSql  = "insert into 系统日志表 (时间,对象,事件类型,参数) values (now(),'任务分配模块',15000,'"+dataSet[i][0] + "号任务分配成功 ');";
+				string logSql  = "insert into 系统日志表 (时间,对象,事件类型,事件说明) values (now(),'任务分配模块',15000,'"+dataSet[i][0] + "号任务分配成功 ');";
 				if (dataSet[i][5]._Equal("4")) { 
 					ackSql = "update 任务分配表 set 任务状态 = 5 where 任务编号 = " + dataSet[i][0]; 
 					cout << "| 任务分配模块     | " << dataSet[i][0] << "号任务撤销发布" << endl;
-					logSql = "insert into 系统日志表 (时间,对象,事件类型,参数) values (now(),'任务分配模块',15000,'" + dataSet[i][0] + "号任务撤销发布 ');";
+					logSql = "insert into 系统日志表 (时间,对象,事件类型,事件说明) values (now(),'任务分配模块',15000,'" + dataSet[i][0] + "号任务撤销发布 ');";
 				}
 				else {
 					cout << "| 任务分配模块     | " << dataSet[i][0] << "号任务分配成功" << endl;
