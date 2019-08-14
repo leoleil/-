@@ -288,7 +288,7 @@ DWORD message_pasing(LPVOID lpParameter)
 					if (date_db.connectMySQL(SERVER, USERNAME, PASSWORD, DATABASE_2, PORT)) {
 						string sql_data = "insert into 系统日志表 (时间,对象,事件类型,事件说明) values (now(),'遥测通信模块',11011,'通信中心机收到第一份";
 						sql_data = sql_data + name + "遥测报表数据报文');";
-						cout << "| 通信模块 | ";
+						cout << "| 通信模块         | ";
 						cout << getTime();
 						cout << "| 接收数据报文";
 						cout.setf(ios::left);
