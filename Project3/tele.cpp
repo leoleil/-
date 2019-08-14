@@ -466,8 +466,13 @@ DWORD message_pasing(LPVOID lpParameter)
 							//如果是状态检测设备
 							if (strcmp(name, "状态检测设备")==0) {
 								/*sql = sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES ( FROM_UNIXTIME(" + to_string(t) + ")," + to_string(state) + ",'" + satillitId + "');";*/
-								sql = sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES (" + to_string(t) + "," + to_string(state) + ",'" + satillitId + "');";
-								db.writeDataToDB(sql);
+								//sql = sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES (" + to_string(t) + "," + to_string(state) + ",'" + satillitId + "');";
+								MySQLInterface date_db;
+								if (date_db.connectMySQL(SERVER, USERNAME, PASSWORD, DATABASE_2, PORT)) {
+									string sql_data = sql = sql = "INSERT INTO `状态记录表`(`状态生效时间`,`无人机状态`,`无人机编号`) VALUES (" + to_string(t) + "," + to_string(state) + ",'" + satillitId + "');";
+									date_db.writeDataToDB(sql_data);
+									date_db.closeMySQL();
+								}
 							}
 							//Sleep(10);
 							EnterCriticalSection(&data_CS);//进入关键代码段
